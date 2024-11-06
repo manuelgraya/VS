@@ -1,0 +1,27 @@
+# 1. Crea una máquina virtual Vagrant estas especificaciones:
+# Sistema operativo Ubuntu, 2 GB de RAM, 2 CPUs virtuales
+# 2. Aprovisiona la máquina virtual con nginx desde el archivo Vagrantfile.
+# 3. Redirecciona el puerto 80 de la máquina virtual al puerto 8086 del host local.
+# 4. Accede a la máquina virtual desde el navegador web del host local.
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64" # Ubuntu 18.04 LTS
+  config.vm.network "private_network", ip: "192.168.50.4"
+  config.ssh.insert_key = false  
+  config.vm.boot_timeout = 120 # Aumentar el tiempo de espera a 600 segundos (10 minutos)
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "2048" # 2GB RAM
+    vb.cpus = 2 # 2 CPUs
+    vb.gui = true # No mostrar la GUI de VirtualBox
+  end
+
+  # Aprovisiona la máquina virtual con nginx desde el archivo Vagrantfile.
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get install -y nginx
+  SHELL
+  
+  # Redirecciona el puerto 80 de la máquina virtual al puerto 8086 del host local.
+  config.vm.network "forwarded_port", guest: 80, host: 8086
+end
